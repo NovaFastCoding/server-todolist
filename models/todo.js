@@ -6,7 +6,7 @@ const TodoSchema = new Schema({
 		type: String,
 		require: true,
 	},
-	dealineTodo: {
+	deadlineTodo: {
 		type: String,
 		require: true,
 	},
