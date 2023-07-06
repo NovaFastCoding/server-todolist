@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 
 const Todo = require('../models/todo');
+const SuccessfulMessages = require('../constants/successfulMessages');
+const ErrorMessages = require('../constants/errorMessages');
 
 router.post('/create', async (req, res) => {
 	try {
@@ -11,13 +13,30 @@ router.post('/create', async (req, res) => {
 
 		return res.json({
 			success: true,
-			message: 'Todo was created successfully.',
+			message: SuccessfulMessages.todo.add,
 		});
 	} catch (error) {
 		console.log(error.message);
 		res.status(500).json({
 			success: false,
-			message: 'Internal server error.',
+			message: ErrorMessages.internalServer,
+		});
+	}
+});
+
+router.get('/', async (req, res) => {
+	try {
+		const todos = await Todo.find();
+		return res.json({
+			success: true,
+			message: SuccessfulMessages.todo.getAll,
+			data: todos,
+		});
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({
+			success: false,
+			message: ErrorMessages.internalServer,
 		});
 	}
 });
