@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 
 const Todo = require('../models/todo');
 const SuccessfulMessages = require('../constants/successfulMessages');
@@ -16,7 +17,6 @@ router.post('/create', async (req, res) => {
 			message: SuccessfulMessages.todo.add,
 		});
 	} catch (error) {
-		console.log(error.message);
 		res.status(500).json({
 			success: false,
 			message: ErrorMessages.internalServer,
@@ -34,6 +34,38 @@ router.get('/', async (req, res) => {
 		});
 	} catch (error) {
 		console.error(error);
+		res.status(500).json({
+			success: false,
+			message: ErrorMessages.internalServer,
+		});
+	}
+});
+
+router.delete('/delete/:id', async (req, res) => {
+	try {
+		const { id } = req.params;
+
+		if (!mongoose.Types.ObjectId.isValid(id)) {
+			return res.status(400).json({
+				success: false,
+				message: ErrorMessages.todo.invalidId,
+			});
+		}
+
+		const deletedTodo = await Todo.findByIdAndDelete(id);
+
+		if (!deletedTodo) {
+			return res.status(404).json({
+				success: false,
+				message: ErrorMessages.todo.notFound,
+			});
+		}
+
+		return res.json({
+			success: true,
+			message: SuccessfulMessages.todo.delete,
+		});
+	} catch (error) {
 		res.status(500).json({
 			success: false,
 			message: ErrorMessages.internalServer,
